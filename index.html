@@ -68,6 +68,9 @@
         // Добавляем маркер текущей локации
         let currentMarker;
 
+        // Переменная для маршрута
+        let routeControl;
+
         // Функция для получения координат по названию места
         async function getCoordinatesByName(placeName) {
             const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${placeName}&addressdetails=1`);
@@ -91,8 +94,13 @@
                 const nextCoords = await getCoordinatesByName(nextLocation.name);
 
                 if (nextCoords) {
-                    // Строим маршрут от текущей геопозиции до следующей локации
-                    L.Routing.control({
+                    // Удаляем старые маршруты, если они существуют
+                    if (routeControl) {
+                        routeControl.remove();
+                    }
+
+                    // Строим новый маршрут от текущей геопозиции до следующей локации
+                    routeControl = L.Routing.control({
                         waypoints: [
                             L.latLng(userCoords.lat, userCoords.lon),
                             L.latLng(nextCoords.lat, nextCoords.lon)
